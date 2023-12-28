@@ -4,7 +4,7 @@ This project is aimed at attempting to predict an NBA player's annual salary bas
 
 This entire project is done using Python and Jupyter Notebooks. Some libraries used include:
 - Numpy
-- MatPlot Lib
+- Matplot Lib
 - Seaborn
 - Pandas
 - SciKit Learn
