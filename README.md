@@ -10,5 +10,17 @@ This entire project is done using Python and Jupyter Notebooks. Some packages us
 - SciKit Learn
 - Dalex
 
-### Salary data set: https://www.kaggle.com/datasets/hultm28/nba-player-salary-data-2002-2017/data
-### Season data set: https://www.kaggle.com/code/koki25ando/nba-salary-prediction-using-multiple-regression/input
+#### Salary data set: https://www.kaggle.com/datasets/hultm28/nba-player-salary-data-2002-2017/data
+#### Season data set: https://www.kaggle.com/code/koki25ando/nba-salary-prediction-using-multiple-regression/input
+
+### Data Pre-Processing
+Data pre-processing was needed in order to format both the seasonal data (contains statistics about a player's performance in a given season) and salary data (contains annual salary that season) into a compatible format. This is by far the biggest task to tackle as the resulting data set must contain matching/correct information about each player's performance, team, age, and salary for each given season.
+
+### Exploratory Data Analysis
+EDA was done on the cleaned data set to explore how NBA statistics have changed over time as well as how salaries have changed over time. This can give us insights as to what types of players played from 2002-2017 and what teams valued in such players. EDA will also assist in determining which features to pick for our regression models
+
+### Machine Learning 
+As stated earlier, the three machine learning algorithms that were tested were  multiple linear regression, lasso regression, ridge regression, and a regression random forest. Out of all of these models, the regression random forest performed the best with a MSE of around 8 and a $ r^2 $ of around 0.63. 
+
+### Variable Importance
+Variable importance allows us to determine which features had more weight in influencing our regression model's output. For the regression random forest, age, rebounds per game, and points per game were the biggest contributors to a player's annual salary.
