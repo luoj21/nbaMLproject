@@ -10,7 +10,7 @@ This project is aimed at attempting to predict an NBA player's annual salary bas
 To get started, clone this repsitory with
 
 ```
-git clone https://github.com/luoj21/hurricaneProj.git
+git clone https://github.com/luoj21/nbaMLproject.git
 
 ```
 
