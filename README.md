@@ -11,13 +11,11 @@ To get started, clone this repsitory with
 
 ```
 git clone https://github.com/luoj21/nbaMLproject.git
-
 ```
 
 and install dependencies:
 
 ```
 pip install -r requirements.txt
-
 ```
 
