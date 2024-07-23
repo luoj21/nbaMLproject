@@ -1,0 +1,120 @@
+import numpy as np 
+import pandas as pd
+import requests
+import time
+import collections
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+
+
+''' Obtains HTML from NBA Reference for the seasons specified.
+The seasons are denoted by the year that they end. So '2024' corresponds to the 2023-2024 season'''
+def request_stats_data(season1: int, season2: int):
+    years = list(range(season1, season2 + 1))
+    for year in years:
+        url = f'https://www.basketball-reference.com/leagues/NBA_{year}_per_game.html'
+        data = requests.get(url)
+        time.sleep(15)
+
+        assert data.status_code < 400
+        
+        with open(f"stats_html/{year}.html", "w+") as f:
+            f.write(data.text)
+
+
+
+''' Obtains HTML from HoopsHype for the seasons specified.
+The seasons are denoted by the year that they end. So '2024' corresponds to the 2023-2024 season'''
+def request_income_data(season1: int, season2: int):
+    years = list(range(season1, season2 + 1))
+    for year in years:
+        url = f'https://hoopshype.com/salaries/players/{year - 1}-{year}/'
+        data = requests.get(url)
+        time.sleep(10)
+
+        assert data.status_code < 400
+        
+        with open(f"income_html/{year}.html", "w+") as f:
+            f.write(data.text)
+
+
+
+''' Exports a CSV for a particular season that contains per game stats
+for each player'''
+def export_stats_data(season: int):
+    with open(f'stats_html/{season}.html') as f:
+        page = f.read()
+
+    soup = BeautifulSoup(page, 'html.parser')
+    season_data = soup.find('table' ,id = "per_game_stats")
+    season_data_df = pd.concat(pd.read_html(str(season_data)))
+    season_data_df['season'] = season
+    season_data_df = season_data_df[season_data_df['Rk'] != 'Rk'] # extra layer of filtering
+    season_data_df.drop(columns = 'Rk', inplace = True)
+
+    #season_data_df.to_csv(f"/Users/jasonluo/Documents/nbaProj/per_game_stats_data/{season}_player_data.csv", 
+                          #index = False, na_rep=r'\N')
+    
+    season_data_df.to_csv(f"/Users/jasonluo/Documents/nbaProj/per_game_stats_data/{season}_player_data.csv", 
+                          index = False, na_rep=np.NaN)
+    
+
+
+''' Exports a CSV for a particular season that contains annual income 
+for each player that played'''
+def export_salary_data(season: int):
+    with open(f'income_html/{season}.html') as f:
+        page = f.read()
+
+    soup = BeautifulSoup(page, 'html.parser')
+    incomes = soup.find('div', class_ = 'hh-salaries-ranking')
+
+    incomes_df = pd.concat(pd.read_html(str(incomes)))
+    incomes_df.drop(incomes_df.columns[0], axis = 1, inplace = True)
+    incomes_df.rename(columns={incomes_df.columns[1]: "income", incomes_df.columns[2]: "adj_income"}, inplace = True)
+
+    for index, row in incomes_df.iterrows():
+        incomes_df.loc[index, 'income'] = int(incomes_df['income'][index][1:].replace(',', ''))
+        incomes_df.loc[index, 'adj_income'] = int(incomes_df['adj_income'][index][1:].replace(',', ''))
+
+    
+    incomes_df['season'] = season
+    incomes_df = incomes_df.sort_values('Player', ascending=True)
+
+
+    incomes_df.to_csv(f"/Users/jasonluo/Documents/nbaProj/player_season_income/{season}_income_data.csv", 
+                          index = False, na_rep=r'\N')
+
+
+def check_player_duplicates(df: pd.DataFrame):
+    if len(df['Player']) != len(pd.unique(df['Player'])):
+        print([item for item, count in collections.Counter(df["Player"]).items() if count > 1])
+
+
+## TODO: player should only be dependent on player_id (ie if player_id = 1 refers to steph curry, then any row with player_id = 1 must be curry)
+
+## For the stats data sets, concatenate them all and assign player_ids based off of incomes (ie every row that has steph curry as the name assign 1)
+## Ensure that the names between income and names are the same format (ie now apostrophes, periods ,etc)
+## If a name in the stats data set has no player_id, drop that row
+
+''' Current DB structure
+
+t1: Income
+(Season , player_id), player, income
+
+t2: Stats
+(Season, player_id), player, ppg, stls, reb, etc...
+
+Final DB structure
+
+t1: Income
+(Season (CPK/FK), player_id, (CPK/FK)) income
+
+t2: Stats
+(Season (CPK/FK), player_id, (CPK/FK)), ppg, stls, reb, etc...
+
+t3: Player Names
+player_id (PK), player
+'''
+def assign_corresponding_ids():
+    pass
