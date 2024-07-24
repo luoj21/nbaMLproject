@@ -83,38 +83,10 @@ def export_salary_data(season: int):
 
 
     incomes_df.to_csv(f"/Users/jasonluo/Documents/nbaProj/player_season_income/{season}_income_data.csv", 
-                          index = False, na_rep=r'\N')
+                          index = False, na_rep=np.NaN)
 
 
 def check_player_duplicates(df: pd.DataFrame):
     if len(df['Player']) != len(pd.unique(df['Player'])):
         print([item for item, count in collections.Counter(df["Player"]).items() if count > 1])
 
-
-## TODO: player should only be dependent on player_id (ie if player_id = 1 refers to steph curry, then any row with player_id = 1 must be curry)
-
-## For the stats data sets, concatenate them all and assign player_ids based off of incomes (ie every row that has steph curry as the name assign 1)
-## Ensure that the names between income and names are the same format (ie now apostrophes, periods ,etc)
-## If a name in the stats data set has no player_id, drop that row
-
-''' Current DB structure
-
-t1: Income
-(Season , player_id), player, income
-
-t2: Stats
-(Season, player_id), player, ppg, stls, reb, etc...
-
-Final DB structure
-
-t1: Income
-(Season (CPK/FK), player_id, (CPK/FK)) income
-
-t2: Stats
-(Season (CPK/FK), player_id, (CPK/FK)), ppg, stls, reb, etc...
-
-t3: Player Names
-player_id (PK), player
-'''
-def assign_corresponding_ids():
-    pass

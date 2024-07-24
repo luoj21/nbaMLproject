@@ -35,10 +35,10 @@ class MySQLConnector():
       self.mydb.cursor().execute("USE NBA_DB")
       self.mydb.cursor().execute("""
                       CREATE TABLE IF NOT EXISTS PER_GAME_STATS (
-                      rk INT NOT NULL,
-                      player VARCHAR(100),         
+                      player_id INT NOT NULL,
+                      season INT NOT NULL,       
                       pos VARCHAR(50),
-                      age FLOAT,
+                      age INT,
                       team VARCHAR(50),
                       games FLOAT,
                       games_started FLOAT,  
@@ -65,25 +65,21 @@ class MySQLConnector():
                       tov FLOAT,
                       pf FLOAT,
                       pts FLOAT,
-                      season INT NOT NULL,
-                      FOREIGN KEY (rk, season) REFERENCES PER_SEASON_INCOME(player_id, season));
+                      PRIMARY KEY (player_id, season),
+                      FOREIGN KEY (player_id) REFERENCES PER_SEASON_INCOME(player_id));
       """)
 
     
-    ''' Loads a player seasonal statistics csv into the PER_GAME_STATS table,
-    where the season is specified'''
-    def load_stats_data(self, season: int):
+    def load_data(self, file_path: str, table_name: str):
 
-      data_folder = '/Users/jasonluo/Documents/nbaProj/per_game_stats_data'
       self.mydb.cursor().execute("USE NBA_DB")
-      self.mydb.cursor().execute(f"""LOAD DATA INFILE '{data_folder}/{season}_player_data.csv'
-                      INTO TABLE PER_GAME_STATS
+      self.mydb.cursor().execute(f"""LOAD DATA INFILE '{file_path}'
+                      INTO TABLE {table_name}
                       FIELDS TERMINATED BY ','
                       LINES TERMINATED BY '\n' 
                       IGNORE 1 LINES;""")
 
       self.mydb.commit()
-
 
 
     def create_income_table(self):
@@ -91,28 +87,46 @@ class MySQLConnector():
         self.mydb.cursor().execute("USE NBA_DB")
         self.mydb.cursor().execute("""CREATE TABLE IF NOT EXISTS PER_SEASON_INCOME (
                                    player_id INT NOT NULL,
-                                   player VARCHAR(100),
+                                   season INT NOT NULL,
                                    income FLOAT,
                                    adj_income FLOAT,
-                                   season INT NOT NULL,
-                                   PRIMARY KEY (player_id, season));""")
-    
+                                   PRIMARY KEY (player_id, season),
+                                   FOREIGN KEY (player_id) REFERENCES PLAYERS_TABLE(player_id));""")
 
-    def load_income_data(self, season: int):
 
-      data_folder = '/Users/jasonluo/Documents/nbaProj/player_season_income'
+    def create_players_table(self):
       self.mydb.cursor().execute("USE NBA_DB")
-      self.mydb.cursor().execute(f"""LOAD DATA INFILE '{data_folder}/{season}_income_data.csv'
-                      INTO TABLE PER_SEASON_INCOME
-                      FIELDS TERMINATED BY ','
-                      LINES TERMINATED BY '\n' 
-                      IGNORE 1 LINES;""")
-
+      self.mydb.cursor().execute("""CREATE TABLE IF NOT EXISTS PLAYERS_TABLE (
+                                 player_id INT NOT NULL,
+                                 player VARCHAR(100),
+                                 PRIMARY KEY (player_id)
+      );""")
       self.mydb.commit()
-
-    
+       
 
     def clear_table(self, database: str, table: str):
         
         self.mydb.cursor().execute(f"USE {database}")
         self.mydb.cursor().execute(f"""TRUNCATE TABLE {table}""")
+
+
+
+''' Original DB structure
+
+t1: Income
+(Season , player_id), player, income
+
+t2: Stats
+(Season, player_id), player, ppg, stls, reb, etc...
+
+Normalized DB structure
+
+t1: Income
+(Season (CPK/FK), player_id, (CPK/FK)) income
+
+t2: Stats
+(Season (CPK/FK), player_id, (CPK/FK)), ppg, stls, reb, etc...
+
+t3: Player Names
+player_id (PK), player
+'''
