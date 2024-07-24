@@ -16,7 +16,7 @@ class RegressionModel():
         self.X = X
         self.y =  y.ravel()
         self.model = RandomForestRegressor(random_state=0,
-                                           n_estimators=150,
+                                           n_estimators=200,
                                            verbose=True)
     
     def split_train_predict(self, test_size: float):
@@ -48,6 +48,7 @@ class RegressionModel():
         scoring=('r2', 'neg_mean_squared_error')
         cv_results = cross_validate(self.model, self.X, self.y, cv=kf, scoring=scoring, return_train_score=False)
         cv_results_df = pd.DataFrame(cv_results)
+        cv_results_df['test_mean_squared_error'] = np.abs(cv_results_df['test_neg_mean_squared_error'])
         
         for i in range(0, n_splits):
             cv_results_df.loc[i, 'fold'] = i+1
