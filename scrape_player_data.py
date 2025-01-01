@@ -85,7 +85,7 @@ def export_salary_data(season: int):
     incomes_df.to_csv(f"/Users/jasonluo/Documents/nbaProj/player_season_income/{season}_income_data.csv", 
                           index = False, na_rep=np.NaN)
 
-
+''' Checks if duplicate players are in data'''
 def check_player_duplicates(df: pd.DataFrame):
     if len(df['Player']) != len(pd.unique(df['Player'])):
         print([item for item, count in collections.Counter(df["Player"]).items() if count > 1])
