@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import KFold, cross_validate
 
-''' Regression model used to predict NBA player salaries
+'''Regression model used to predict NBA player salaries
 using Random Forest Regression'''
 
 class RegressionModel():
