@@ -4,4 +4,6 @@ This project utilizes webs scraping, database design, data wrangling, and machin
 
 Python version: ```python 3.10.5```
 
+Cloning repo: ``` git clone https://github.com/luoj21/nbaMLproject.git ```
+
 Install dependencies: ```pip install -r requirements.txt```
