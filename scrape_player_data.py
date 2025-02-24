@@ -5,6 +5,7 @@ import time
 import collections
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from io import StringIO
 
 
 ''' Obtains HTML from NBA Reference for the seasons specified.
@@ -47,7 +48,7 @@ def export_stats_data(season: int):
 
     soup = BeautifulSoup(page, 'html.parser')
     season_data = soup.find('table' ,id = "per_game_stats")
-    season_data_df = pd.concat(pd.read_html(str(season_data)))
+    season_data_df = pd.concat(pd.read_html(StringIO(str(season_data))))
     season_data_df['season'] = season
     season_data_df = season_data_df[season_data_df['Rk'] != 'Rk'] # extra layer of filtering
     season_data_df.drop(columns = 'Rk', inplace = True)
@@ -69,7 +70,7 @@ def export_salary_data(season: int):
     soup = BeautifulSoup(page, 'html.parser')
     incomes = soup.find('div', class_ = 'hh-salaries-ranking')
 
-    incomes_df = pd.concat(pd.read_html(str(incomes)))
+    incomes_df = pd.concat(pd.read_html(StringIO(str(incomes))))
     incomes_df.drop(incomes_df.columns[0], axis = 1, inplace = True)
     incomes_df.rename(columns={incomes_df.columns[1]: "income", incomes_df.columns[2]: "adj_income"}, inplace = True)
 
