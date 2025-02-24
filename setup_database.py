@@ -1,3 +1,4 @@
+import mysql
 import mysql.connector
 
 ''' Connects user to MySQL database'''
